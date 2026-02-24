@@ -1,0 +1,1483 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OC · 世界观 · 小说工作台</title>
+  <meta name="description" content="可在网页内编辑的 OC / 世界观 / 小说设定站，支持本地保存与 GitHub 同步（可选）。" />
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --panel:#101826;
+      --panel2:#0f172a;
+      --text:#e6edf7;
+      --muted:#a9b4c2;
+      --line:#223047;
+      --chip:#15233a;
+      --accent:#7dd3fc;
+      --accent2:#a78bfa;
+      --ok:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow: 0 14px 50px rgba(0,0,0,.45);
+      --radius: 18px;
+      --radius2: 14px;
+      --max: 1180px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, "Noto Sans CJK SC", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 10% -10%, rgba(167,139,250,.18), transparent 60%),
+        radial-gradient(900px 700px at 85% 0%, rgba(125,211,252,.16), transparent 55%),
+        linear-gradient(180deg, var(--bg), #070b10 70%);
+    }
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width:var(--max); margin:0 auto; padding:24px; }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background: rgba(11,15,20,.76);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(34,48,71,.55);
+    }
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 24px;
+      max-width:var(--max);
+      margin:0 auto;
+    }
+    .brand{ display:flex; align-items:center; gap:12px; min-width: 250px; }
+    .logo{
+      width:38px; height:38px;
+      border-radius:12px;
+      background: linear-gradient(135deg, rgba(125,211,252,.95), rgba(167,139,250,.95));
+      box-shadow: 0 10px 30px rgba(125,211,252,.10);
+      position:relative;
+      flex: 0 0 auto;
+    }
+    .logo::after{ content:"✦"; position:absolute; inset:0; display:grid; place-items:center; color:#0b0f14; font-weight:900; }
+    .brand h1{ font-size:14px; margin:0; letter-spacing:.2px; }
+    .brand p{ margin:2px 0 0; font-size:12px; color:var(--muted); }
+
+    nav{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+    .tab{
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid rgba(34,48,71,.8);
+      background: rgba(16,24,38,.55);
+      color:var(--muted);
+      font-size:13px;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .08s ease, background .2s ease, color .2s ease, border-color .2s ease;
+    }
+    .tab:hover{ transform: translateY(-1px); border-color: rgba(125,211,252,.55); color:var(--text); }
+    .tab[aria-selected="true"]{
+      background: linear-gradient(135deg, rgba(125,211,252,.18), rgba(167,139,250,.18));
+      border-color: rgba(125,211,252,.55);
+      color:var(--text);
+    }
+
+    .actions{ display:flex; gap:10px; align-items:center; min-width: 340px; justify-content:flex-end; flex-wrap:wrap; }
+    .search{
+      width:min(360px, 56vw);
+      display:flex; gap:10px; align-items:center;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(34,48,71,.85);
+      background: rgba(16,24,38,.55);
+    }
+    .search input{
+      width:100%;
+      border:none; outline:none;
+      background:transparent;
+      color:var(--text);
+      font-size:13px;
+    }
+
+    .btn{
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(34,48,71,.85);
+      background: rgba(16,24,38,.55);
+      color: var(--muted);
+      font-size:13px;
+      cursor:pointer;
+      transition: transform .08s ease, border-color .2s ease, color .2s ease;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(167,139,250,.55); color: var(--text); }
+    .btn.primary{ border-color: rgba(125,211,252,.65); color: var(--text); background: rgba(125,211,252,.10); }
+    .btn.ok{ border-color: rgba(52,211,153,.65); color: var(--text); background: rgba(52,211,153,.08); }
+    .btn.bad{ border-color: rgba(251,113,133,.65); color: var(--text); background: rgba(251,113,133,.08); }
+
+    .hero{
+      margin:26px 0 18px;
+      padding:22px 20px;
+      border:1px solid rgba(34,48,71,.75);
+      background: linear-gradient(135deg, rgba(16,24,38,.75), rgba(15,23,42,.55));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero::before{
+      content:"";
+      position:absolute;
+      width:520px; height:520px;
+      right:-220px; top:-260px;
+      background: radial-gradient(circle at 30% 30%, rgba(125,211,252,.32), transparent 60%),
+                  radial-gradient(circle at 70% 70%, rgba(167,139,250,.28), transparent 55%);
+      filter: blur(2px);
+      opacity:.85;
+      pointer-events:none;
+    }
+    .hero h2{ margin:0 0 6px; font-size:20px; letter-spacing:.2px; }
+    .hero p{ margin:0; color:var(--muted); line-height:1.7; max-width: 76ch; }
+    .mini{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .badge{
+      font-size:12px;
+      padding:7px 10px;
+      border-radius:999px;
+      background: rgba(21,35,58,.75);
+      border:1px solid rgba(34,48,71,.85);
+      color:var(--muted);
+    }
+
+    .grid{ display:grid; grid-template-columns: 340px 1fr; gap:16px; }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .actions{ min-width: unset; justify-content:flex-start; }
+      .brand{ min-width: unset; }
+    }
+
+    .panel{
+      border:1px solid rgba(34,48,71,.75);
+      background: rgba(16,24,38,.62);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel .hd{
+      padding:14px 16px;
+      border-bottom:1px solid rgba(34,48,71,.75);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .panel .hd h3{ margin:0; font-size:14px; letter-spacing:.2px; }
+    .panel .bd{ padding:14px 16px; }
+
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+    .chip{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(34,48,71,.85);
+      background: rgba(21,35,58,.72);
+      color:var(--muted);
+      font-size:12px;
+      cursor:pointer;
+      transition: transform .08s ease, color .2s ease, border-color .2s ease;
+      user-select:none;
+    }
+    .chip:hover{ transform: translateY(-1px); color:var(--text); border-color: rgba(125,211,252,.55); }
+    .chip[data-active="true"]{ color:var(--text); border-color: rgba(125,211,252,.65); background: rgba(125,211,252,.10); }
+
+    .list{ display:flex; flex-direction:column; gap:10px; }
+    .card{
+      border:1px solid rgba(34,48,71,.75);
+      background: linear-gradient(135deg, rgba(16,24,38,.75), rgba(15,23,42,.55));
+      border-radius: var(--radius2);
+      padding:12px;
+      cursor:pointer;
+      transition: transform .08s ease, border-color .2s ease;
+    }
+    .card:hover{ transform: translateY(-2px); border-color: rgba(167,139,250,.55); }
+    .card h4{ margin:0; font-size:14px; }
+    .card .sub{ margin:4px 0 0; color:var(--muted); font-size:12px; line-height:1.6; }
+    .card .meta{ margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; }
+    .tag{
+      font-size:11px;
+      padding:5px 8px;
+      border-radius:999px;
+      border:1px solid rgba(34,48,71,.85);
+      background: rgba(21,35,58,.6);
+      color:var(--muted);
+    }
+
+    .page{ display:none; }
+    .page[data-active="true"]{ display:block; }
+
+    .form{
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .row{ display:grid; grid-template-columns: 120px 1fr; gap:10px; align-items:start; }
+    @media (max-width: 740px){ .row{ grid-template-columns: 1fr; } }
+    label{ color: var(--muted); font-size:12px; padding-top:10px; }
+    input, textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(34,48,71,.85);
+      background: rgba(15,23,42,.55);
+      color: var(--text);
+      font-size:13px;
+      outline:none;
+    }
+    textarea{ min-height: 110px; resize: vertical; line-height:1.7; }
+
+    .toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .hint{
+      font-size:12px;
+      color: var(--muted);
+      line-height:1.6;
+      border:1px dashed rgba(34,48,71,.85);
+      padding:10px 12px;
+      border-radius: 14px;
+      background: rgba(15,23,42,.35);
+    }
+
+    .split{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    @media (max-width: 980px){ .split{ grid-template-columns: 1fr; } }
+
+    dialog{
+      border:none;
+      border-radius: 22px;
+      width: min(920px, calc(100vw - 20px));
+      background: rgba(10,14,20,.88);
+      color: var(--text);
+      box-shadow: 0 24px 80px rgba(0,0,0,.6);
+      padding:0;
+    }
+    dialog::backdrop{ background: rgba(0,0,0,.55); backdrop-filter: blur(2px); }
+    .modal{ border:1px solid rgba(34,48,71,.85); border-radius: 22px; overflow:hidden; }
+    .mh{
+      padding:14px 16px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      border-bottom:1px solid rgba(34,48,71,.8);
+      background: linear-gradient(135deg, rgba(16,24,38,.92), rgba(15,23,42,.70));
+    }
+    .mh .title{ display:flex; gap:10px; align-items:center; }
+    .avatar{
+      width:40px; height:40px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(125,211,252,.55), rgba(167,139,250,.55));
+      border:1px solid rgba(34,48,71,.75);
+      display:grid; place-items:center;
+      color:#0b0f14;
+      font-weight:900;
+    }
+    .mh h3{ margin:0; font-size:15px; }
+    .mh p{ margin:2px 0 0; font-size:12px; color:var(--muted); }
+    .x{
+      border:1px solid rgba(34,48,71,.85);
+      background: rgba(16,24,38,.55);
+      color: var(--muted);
+      border-radius: 12px;
+      padding:8px 10px;
+      cursor:pointer;
+    }
+    .x:hover{ color: var(--text); border-color: rgba(125,211,252,.55); }
+    .mb{ padding:16px; }
+
+    .status{ font-size:12px; color: var(--muted); }
+    .dot{ display:inline-block; width:8px; height:8px; border-radius:999px; margin-right:8px; background: rgba(169,180,194,.55); }
+    .dot.ok{ background: rgba(52,211,153,.85); }
+    .dot.warn{ background: rgba(251,191,36,.85); }
+    .dot.bad{ background: rgba(251,113,133,.85); }
+
+    footer{ margin:20px 0 8px; text-align:center; color:var(--muted); font-size:12px; opacity:.9; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <h1>OC · 世界观 · 小说工作台</h1>
+        <p>网页内编辑 + 本地保存 + 可选 GitHub 同步（用于跨设备）</p>
+      </div>
+    </div>
+
+    <nav aria-label="主导航">
+      <div class="tab" role="tab" aria-selected="true" data-page="home">主界面</div>
+      <div class="tab" role="tab" aria-selected="false" data-page="oc">OC</div>
+      <div class="tab" role="tab" aria-selected="false" data-page="world">世界观</div>
+      <div class="tab" role="tab" aria-selected="false" data-page="novel">小说</div>
+    </nav>
+
+    <div class="actions">
+      <div class="search" title="搜索：名字 / 关键词 / #标签（在OC/小说页可用）">
+        <span aria-hidden="true">⌕</span>
+        <input id="q" type="search" placeholder="搜索：角色名 / 设定词 / #标签" autocomplete="off" />
+      </div>
+      <button class="btn" id="editToggle">进入编辑模式</button>
+      <button class="btn ok" id="saveLocal" title="保存到本地浏览器">本地保存</button>
+      <button class="btn primary" id="syncOpen" title="打开 GitHub 同步面板">GitHub 同步</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <h2>你的宇宙控制台已上线 ✨</h2>
+    <p>
+      你可以在网站里直接编辑 OC、世界观、小说条目。默认是<strong>只读</strong>，点右上角“进入编辑模式”就能改。
+      点“本地保存”会保存到当前浏览器；如果你想<strong>跨设备同步</strong>，就用 GitHub 同步。
+    </p>
+    <div class="mini">
+      <span class="badge">📝 直接编辑</span>
+      <span class="badge">🗂️ 多页导航</span>
+      <span class="badge">🏷️ 标签筛选</span>
+      <span class="badge">☁️ GitHub 跨设备</span>
+    </div>
+  </section>
+
+  <!-- HOME -->
+  <section class="page" id="page-home" data-active="true">
+    <div class="grid">
+      <aside class="panel">
+        <div class="hd"><h3>快捷入口</h3><span class="status" id="homeStatus"></span></div>
+        <div class="bd">
+          <div class="toolbar" style="margin-bottom:10px;">
+            <button class="btn" data-jump="oc">去 OC</button>
+            <button class="btn" data-jump="world">去 世界观</button>
+            <button class="btn" data-jump="novel">去 小说</button>
+          </div>
+          <div class="hint">
+            <strong>用法小抄：</strong><br/>
+            ① 点“进入编辑模式”才可修改；<br/>
+            ② 修改完点“本地保存”；<br/>
+            ③ 想跨设备：用 GitHub 同步，把数据写到仓库的 <span style="color:var(--accent)">data.json</span>。<br/>
+            <span class="muted">提示：</span>访客只要能打开你的网页，就只能看，不能写回仓库。
+          </div>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <div class="hd"><h3>总览</h3><span class="status" id="summary"></span></div>
+        <div class="bd">
+          <div class="split">
+            <div class="panel" style="box-shadow:none;">
+              <div class="hd"><h3>OC</h3><span class="muted" id="ocCount">0</span></div>
+              <div class="bd" id="ocPeek"></div>
+            </div>
+            <div class="panel" style="box-shadow:none;">
+              <div class="hd"><h3>小说</h3><span class="muted" id="novelCount">0</span></div>
+              <div class="bd" id="novelPeek"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- OC -->
+  <section class="page" id="page-oc" data-active="false">
+    <div class="grid">
+      <aside class="panel">
+        <div class="hd"><h3>OC 筛选</h3><button class="btn" id="ocReset">重置</button></div>
+        <div class="bd">
+          <p class="muted" style="margin:0 0 10px;">点击标签筛选（可多选），或用顶部搜索框。</p>
+          <div class="chips" id="ocChips"></div>
+          <div style="height:12px"></div>
+          <div class="toolbar">
+            <button class="btn primary" id="ocNew">+ 新建 OC</button>
+            <button class="btn" id="ocDuplicate">复制当前</button>
+            <button class="btn bad" id="ocDelete">删除当前</button>
+          </div>
+          <div style="height:12px"></div>
+          <div class="hint">
+            <strong>标签写法：</strong>用 <span style="color:var(--accent)">#</span> 开头，例如：#主角 #王都 #现代AU<br/>
+            <span class="muted">搜索也支持 #标签。</span>
+          </div>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <div class="hd"><h3>OC 列表</h3><span class="muted" id="ocListCount">0</span></div>
+        <div class="bd">
+          <div class="list" id="ocList"></div>
+          <div style="height:12px"></div>
+          <div class="panel" style="box-shadow:none;">
+            <div class="hd"><h3>OC 编辑器</h3><span class="status" id="ocEditorStatus"></span></div>
+            <div class="bd">
+              <div class="form" id="ocForm">
+                <div class="row">
+                  <label>角色名</label>
+                  <input id="oc_name" placeholder="例如：阿羽" disabled />
+                </div>
+                <div class="row">
+                  <label>一句话定位</label>
+                  <input id="oc_line" placeholder="身份/矛盾/气质" disabled />
+                </div>
+                <div class="row">
+                  <label>标签</label>
+                  <input id="oc_tags" placeholder="#主角 #森林 #白发金眼" disabled />
+                </div>
+                <div class="row">
+                  <label>外观</label>
+                  <textarea id="oc_look" placeholder="外貌、穿搭、标志物" disabled></textarea>
+                </div>
+                <div class="row">
+                  <label>性格</label>
+                  <textarea id="oc_persona" placeholder="性格、口癖、雷点" disabled></textarea>
+                </div>
+                <div class="row">
+                  <label>能力/设定</label>
+                  <textarea id="oc_power" placeholder="能力/规则/限制" disabled></textarea>
+                </div>
+                <div class="row">
+                  <label>剧情锚点</label>
+                  <textarea id="oc_hooks" placeholder="关键事件/伏笔/情感线" disabled></textarea>
+                </div>
+                <div class="row">
+                  <label>备注</label>
+                  <textarea id="oc_notes" placeholder="关系、补充、彩蛋" disabled></textarea>
+                </div>
+              </div>
+              <div class="toolbar" style="margin-top:10px;">
+                <button class="btn ok" id="ocSave" title="仅更新内存中的数据（记得本地保存/同步）" disabled>更新此OC</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- WORLD -->
+  <section class="page" id="page-world" data-active="false">
+    <div class="grid">
+      <aside class="panel">
+        <div class="hd"><h3>世界观工具</h3><span class="muted">&nbsp;</span></div>
+        <div class="bd">
+          <div class="toolbar">
+            <button class="btn primary" id="worldNewSection">+ 新增小节</button>
+            <button class="btn bad" id="worldDeleteSection">删除小节</button>
+          </div>
+          <div style="height:12px"></div>
+          <div class="hint">
+            <strong>建议写法：</strong><br/>
+            每个小节尽量有“规则”“限制”“代价”“示例”。这样你 AU 再多也不会炸成一锅粥。🍲
+          </div>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <div class="hd"><h3>世界观小节</h3><span class="muted" id="worldCount">0</span></div>
+        <div class="bd">
+          <div class="split">
+            <div class="panel" style="box-shadow:none;">
+              <div class="hd"><h3>目录</h3><span class="muted" id="worldListCount">0</span></div>
+              <div class="bd"><div class="list" id="worldList"></div></div>
+            </div>
+
+            <div class="panel" style="box-shadow:none;">
+              <div class="hd"><h3>编辑器</h3><span class="status" id="worldEditorStatus"></span></div>
+              <div class="bd">
+                <div class="form">
+                  <div class="row">
+                    <label>小节标题</label>
+                    <input id="w_title" placeholder="例如：力量体系" disabled />
+                  </div>
+                  <div class="row">
+                    <label>内容</label>
+                    <textarea id="w_body" placeholder="写设定（支持纯文本/简单分行）" disabled></textarea>
+                  </div>
+                  <div class="row">
+                    <label>标签（可选）</label>
+                    <input id="w_tags" placeholder="#术法 #机构 #地理" disabled />
+                  </div>
+                </div>
+                <div class="toolbar" style="margin-top:10px;">
+                  <button class="btn ok" id="worldSave" disabled>更新此小节</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- NOVEL -->
+  <section class="page" id="page-novel" data-active="false">
+    <div class="grid">
+      <aside class="panel">
+        <div class="hd"><h3>小说工具</h3><button class="btn" id="novelReset">重置</button></div>
+        <div class="bd">
+          <div class="toolbar">
+            <button class="btn primary" id="novelNew">+ 新建条目</button>
+            <button class="btn" id="novelDuplicate">复制当前</button>
+            <button class="btn bad" id="novelDelete">删除当前</button>
+          </div>
+          <div style="height:12px"></div>
+          <div class="hint">
+            这里适合放：章节梗概、关键片段、标题关键词、伏笔清单等。<br/>
+            <span class="muted">你也可以把“短篇”当成一个条目写完整。</span>
+          </div>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <div class="hd"><h3>小说条目</h3><span class="muted" id="novelListCount">0</span></div>
+        <div class="bd">
+          <div class="split">
+            <div class="panel" style="box-shadow:none;">
+              <div class="hd"><h3>列表</h3><span class="muted" id="novelCount2">0</span></div>
+              <div class="bd"><div class="list" id="novelList"></div></div>
+            </div>
+
+            <div class="panel" style="box-shadow:none;">
+              <div class="hd"><h3>编辑器</h3><span class="status" id="novelEditorStatus"></span></div>
+              <div class="bd">
+                <div class="form">
+                  <div class="row">
+                    <label>标题</label>
+                    <input id="n_title" placeholder="例如：Chapter 1 - The First Snow" disabled />
+                  </div>
+                  <div class="row">
+                    <label>关键词</label>
+                    <input id="n_keywords" placeholder="#联姻 #误会 #夜雪" disabled />
+                  </div>
+                  <div class="row">
+                    <label>正文</label>
+                    <textarea id="n_body" placeholder="写梗概/片段/章节内容" disabled style="min-height:220px"></textarea>
+                  </div>
+                  <div class="row">
+                    <label>关联 OC（可选）</label>
+                    <input id="n_links" placeholder="用角色名或id，用逗号分隔" disabled />
+                  </div>
+                </div>
+                <div class="toolbar" style="margin-top:10px;">
+                  <button class="btn ok" id="novelSave" disabled>更新此条目</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <footer>
+    单文件版：把本文件命名为 <b>index.html</b>，搭配一个 <b>data.json</b>（可选），即可用 GitHub Pages/Netlify/Vercel 发布。
+  </footer>
+</main>
+
+<!-- GitHub Sync Modal -->
+<dialog id="syncDlg">
+  <div class="modal">
+    <div class="mh">
+      <div class="title">
+        <div class="avatar">☁️</div>
+        <div>
+          <h3>GitHub 同步（跨设备）</h3>
+          <p>把数据读写到你的仓库：只有你能写，访客只能看。</p>
+        </div>
+      </div>
+      <button class="x" id="syncClose">关闭</button>
+    </div>
+    <div class="mb">
+      <div class="hint" style="margin-bottom:12px;">
+        <strong>最推荐的仓库结构：</strong><br/>
+        ① 仓库根目录放 <span style="color:var(--accent)">index.html</span>（本文件）<br/>
+        ② 再放一个 <span style="color:var(--accent)">data.json</span>（网站数据）<br/>
+        ③ 同步时，本页面会把数据写进 data.json。<br/>
+        <span class="muted">提醒：</span>Token 只保存在你的浏览器（localStorage）。在公共电脑别用。
+      </div>
+
+      <div class="split">
+        <div>
+          <div class="form">
+            <div class="row"><label>owner</label><input id="gh_owner" placeholder="例如：laochaizi" /></div>
+            <div class="row"><label>repo</label><input id="gh_repo" placeholder="例如：my-oc-site" /></div>
+            <div class="row"><label>branch</label><input id="gh_branch" placeholder="main" /></div>
+            <div class="row"><label>path</label><input id="gh_path" placeholder="data.json" /></div>
+            <div class="row"><label>Token</label><input id="gh_token" placeholder="ghp_...（Personal Access Token）" /></div>
+          </div>
+          <div class="toolbar" style="margin-top:10px;">
+            <button class="btn" id="ghRemember">记住配置</button>
+            <button class="btn bad" id="ghForget">清除</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel" style="box-shadow:none;">
+            <div class="hd"><h3>同步操作</h3><span class="status" id="ghStatus"><span class="dot"></span>未连接</span></div>
+            <div class="bd">
+              <div class="toolbar" style="margin-bottom:10px;">
+                <button class="btn primary" id="ghPull">从 GitHub 拉取</button>
+                <button class="btn ok" id="ghPush">推送到 GitHub</button>
+              </div>
+              <div class="hint">
+                <strong>拉取</strong>：用仓库里的 data.json 覆盖当前数据（用于换设备）。<br/>
+                <strong>推送</strong>：把当前数据写回 data.json（用于同步更新）。
+              </div>
+              <div style="height:10px"></div>
+              <div class="hint">
+                <strong>如果推送失败：</strong><br/>
+                ① token 权限不够（需要 repo 权限）<br/>
+                ② 文件不存在（先在仓库里建一个空的 data.json）<br/>
+                ③ 分支名不是 main（有些仓库是 master）
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:12px"></div>
+      <div class="panel" style="box-shadow:none;">
+        <div class="hd"><h3>手动导入/导出（备份）</h3><span class="muted">JSON</span></div>
+        <div class="bd">
+          <div class="toolbar">
+            <button class="btn" id="exportJson">导出 JSON</button>
+            <button class="btn" id="importJson">导入 JSON</button>
+          </div>
+          <div style="height:10px"></div>
+          <textarea id="jsonBox" placeholder="这里会显示导出的 JSON；或粘贴 JSON 以导入" style="min-height:160px"></textarea>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</dialog>
+
+<script>
+  // =====================
+  // 数据结构（会存到 localStorage，也可推送到 GitHub 的 data.json）
+  // =====================
+  const STORAGE_KEY = 'OC_WORLD_NOVEL_DATA_V1';
+  const CFG_KEY = 'OC_WORLD_NOVEL_GH_CFG_V1';
+
+  const DEFAULT_DATA = {
+    meta: {
+      title: '我的 OC · 世界观 · 小说工作台',
+      updatedAt: new Date().toISOString(),
+      version: 1
+    },
+    oc: [
+      {
+        id: 'ayu',
+        name: '阿羽',
+        line: '森林之神 / 神鸟化形 / 好奇又嘴硬',
+        tags: ['#主角', '#森林', '#神鸟', '#白发金眼'],
+        look: '白发金眼，高挑漂亮，气质有一点“人间不太懂”的神性。',
+        persona: '天真好奇、情绪透明、炸毛嘴硬但黏人；爱吃软糯温热的甜。',
+        power: '与森林共鸣、驭鸟/鸟语；力量受“规则/代价/边界”限制（你可在世界观里定义）。',
+        hooks: '冬日捡到雏鸟；漫长等待与重生；所有 AU 像她的幻想剧场。',
+        notes: '设定站里保持统一脸；想写甜中带悬也很适配。'
+      }
+    ],
+    world: [
+      {
+        id: 'world-core',
+        title: '世界观总纲',
+        tags: ['#总纲'],
+        body: '在这里写：世界规则、力量来源、限制与代价、社会结构。\n\n建议每条规则都配一个例子，后续扩 AU 会非常稳。'
+      },
+      {
+        id: 'system',
+        title: '力量体系',
+        tags: ['#术法', '#规则'],
+        body: '写法建议：\n- 来源：力量从哪里来？\n- 代价：使用会失去什么？\n- 限制：不能做什么？\n- 例子：一个典型技能如何运作？'
+      }
+    ],
+    novel: [
+      {
+        id: 'n1',
+        title: '小故事示例：冬日门口的雏鸟',
+        keywords: ['#起源', '#冬日', '#相遇'],
+        links: ['ayu'],
+        body: '你可以把梗概写在这里，也可以写完整短篇。\n\n建议：标题 + 关键词 + 正文，一条条堆起来，就会形成你的“宇宙档案”。'
+      }
+    ]
+  };
+
+  // =====================
+  // 状态
+  // =====================
+  const state = {
+    page: 'home',
+    edit: false,
+    query: '',
+    ocActiveTags: new Set(),
+    ocSelectedId: null,
+    worldSelectedId: null,
+    novelSelectedId: null,
+    data: null,
+  };
+
+  // =====================
+  // 工具
+  // =====================
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+  const uid = (prefix='id') => `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
+
+  function clone(obj){ return JSON.parse(JSON.stringify(obj)); }
+
+  function normTags(str){
+    const raw = (str||'').trim();
+    if(!raw) return [];
+    const parts = raw.split(/[\s,，]+/).map(s=>s.trim()).filter(Boolean);
+    const tags = [];
+    for(const p of parts){
+      if(p.startsWith('#')) tags.push(p);
+      else tags.push('#'+p);
+    }
+    // 去重
+    return Array.from(new Set(tags));
+  }
+
+  function tagsToStr(tags){ return (tags||[]).join(' '); }
+
+  function setStatus(el, kind, text){
+    const dot = kind === 'ok' ? 'ok' : kind === 'warn' ? 'warn' : kind === 'bad' ? 'bad' : '';
+    el.innerHTML = `<span class="dot ${dot}"></span>${escapeHtml(text)}`;
+  }
+
+  function escapeHtml(str){
+    return String(str ?? '')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'",'&#39;');
+  }
+
+  // =====================
+  // 存取
+  // =====================
+  function loadLocal(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return clone(DEFAULT_DATA);
+      const parsed = JSON.parse(raw);
+      return mergeDefaults(parsed);
+    }catch{
+      return clone(DEFAULT_DATA);
+    }
+  }
+
+  function mergeDefaults(d){
+    // 轻度合并，避免缺字段
+    const base = clone(DEFAULT_DATA);
+    const out = base;
+    if(d && typeof d === 'object'){
+      out.meta = { ...base.meta, ...(d.meta||{}) };
+      out.oc = Array.isArray(d.oc) ? d.oc : base.oc;
+      out.world = Array.isArray(d.world) ? d.world : base.world;
+      out.novel = Array.isArray(d.novel) ? d.novel : base.novel;
+    }
+    return out;
+  }
+
+  function saveLocal(){
+    state.data.meta.updatedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data, null, 2));
+  }
+
+  // =====================
+  // 页面切换
+  // =====================
+  function switchPage(page){
+    state.page = page;
+    $$('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.page === page ? 'true' : 'false'));
+    $$('.page').forEach(p => p.dataset.active = (p.id === `page-${page}`) ? 'true' : 'false');
+
+    // 搜索框在 home/world 也能输入，但主要作用在 oc/novel
+    render();
+  }
+
+  // =====================
+  // 编辑模式
+  // =====================
+  function applyEditMode(){
+    const disabled = !state.edit;
+    // OC
+    ['oc_name','oc_line','oc_tags','oc_look','oc_persona','oc_power','oc_hooks','oc_notes','ocSave','ocNew','ocDuplicate','ocDelete']
+      .forEach(id => { const el = document.getElementById(id); if(el) el.disabled = disabled; });
+    // WORLD
+    ['w_title','w_body','w_tags','worldSave','worldNewSection','worldDeleteSection']
+      .forEach(id => { const el = document.getElementById(id); if(el) el.disabled = disabled; });
+    // NOVEL
+    ['n_title','n_keywords','n_body','n_links','novelSave','novelNew','novelDuplicate','novelDelete']
+      .forEach(id => { const el = document.getElementById(id); if(el) el.disabled = disabled; });
+
+    $('#editToggle').textContent = state.edit ? '退出编辑模式' : '进入编辑模式';
+    $('#ocEditorStatus').textContent = state.edit ? '可编辑' : '只读';
+    $('#worldEditorStatus').textContent = state.edit ? '可编辑' : '只读';
+    $('#novelEditorStatus').textContent = state.edit ? '可编辑' : '只读';
+  }
+
+  // =====================
+  // 渲染总览（home）
+  // =====================
+  function renderHome(){
+    const d = state.data;
+    $('#ocCount').textContent = `${d.oc.length} 个`;
+    $('#novelCount').textContent = `${d.novel.length} 条`;
+
+    const ocPeek = d.oc.slice(0,3).map(o => `
+      <div class="card" data-peek-oc="${escapeHtml(o.id)}">
+        <h4>${escapeHtml(o.name)}</h4>
+        <div class="sub">${escapeHtml(o.line||'')}</div>
+        <div class="meta">${(o.tags||[]).slice(0,5).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+      </div>
+    `).join('') || `<div class="hint">还没有 OC，去 OC 页新建一个吧。</div>`;
+    $('#ocPeek').innerHTML = ocPeek;
+
+    const novelPeek = d.novel.slice(0,3).map(n => `
+      <div class="card" data-peek-n="${escapeHtml(n.id)}">
+        <h4>${escapeHtml(n.title)}</h4>
+        <div class="sub">${escapeHtml((n.body||'').slice(0,70))}${(n.body||'').length>70?'…':''}</div>
+        <div class="meta">${(n.keywords||[]).slice(0,5).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+      </div>
+    `).join('') || `<div class="hint">还没有小说条目，去 小说 页写一个吧。</div>`;
+    $('#novelPeek').innerHTML = novelPeek;
+
+    const upd = new Date(d.meta.updatedAt);
+    $('#summary').textContent = `上次更新：${isNaN(upd.getTime()) ? d.meta.updatedAt : upd.toLocaleString()}`;
+
+    // 状态
+    const hasLocal = !!localStorage.getItem(STORAGE_KEY);
+    const text = hasLocal ? '本地已保存（此设备）' : '未本地保存';
+    $('#homeStatus').textContent = text;
+
+    // bind peek clicks
+    $$('[data-peek-oc]').forEach(el => el.onclick = () => {
+      const id = el.getAttribute('data-peek-oc');
+      state.ocSelectedId = id;
+      switchPage('oc');
+    });
+    $$('[data-peek-n]').forEach(el => el.onclick = () => {
+      const id = el.getAttribute('data-peek-n');
+      state.novelSelectedId = id;
+      switchPage('novel');
+    });
+  }
+
+  // =====================
+  // OC
+  // =====================
+  function ocAllTags(){
+    const set = new Set();
+    state.data.oc.forEach(o => (o.tags||[]).forEach(t => set.add(t)));
+    return Array.from(set).sort((a,b)=>a.localeCompare(b,'zh-CN'));
+  }
+
+  function ocMatch(o){
+    const q = state.query.trim();
+    const hay = [
+      o.name, o.line, o.look, o.persona, o.power, o.hooks, o.notes,
+      ...(o.tags||[])
+    ].filter(Boolean).join(' ').toLowerCase();
+
+    const qTags = (q.match(/#[^\s#]+/g) || []).map(s=>s.trim());
+    const plain = q.replace(/#[^\s#]+/g,'').trim().toLowerCase();
+
+    const tagOk = qTags.length === 0 || qTags.every(t => (o.tags||[]).includes(t));
+    const chipOk = state.ocActiveTags.size === 0 || Array.from(state.ocActiveTags).every(t => (o.tags||[]).includes(t));
+    const textOk = !plain || hay.includes(plain);
+
+    return tagOk && chipOk && textOk;
+  }
+
+  function renderOC(){
+    // chips
+    const chips = $('#ocChips');
+    chips.innerHTML = '';
+    ocAllTags().forEach(tag => {
+      const el = document.createElement('div');
+      el.className = 'chip';
+      el.textContent = tag;
+      el.dataset.tag = tag;
+      el.dataset.active = state.ocActiveTags.has(tag) ? 'true' : 'false';
+      el.onclick = () => {
+        if(state.ocActiveTags.has(tag)) state.ocActiveTags.delete(tag);
+        else state.ocActiveTags.add(tag);
+        renderOC();
+      };
+      chips.appendChild(el);
+    });
+
+    const list = state.data.oc.filter(ocMatch);
+    $('#ocListCount').textContent = `${list.length} 个`;
+
+    const box = $('#ocList');
+    box.innerHTML = '';
+
+    list.forEach(o => {
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.dataset.id = o.id;
+      el.innerHTML = `
+        <h4>${escapeHtml(o.name)}</h4>
+        <div class="sub">${escapeHtml(o.line||'')}</div>
+        <div class="meta">${(o.tags||[]).slice(0,7).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+      `;
+      el.onclick = () => {
+        state.ocSelectedId = o.id;
+        fillOCForm();
+      };
+      box.appendChild(el);
+    });
+
+    if(!state.ocSelectedId){
+      state.ocSelectedId = state.data.oc[0]?.id || null;
+    }
+    if(state.ocSelectedId && !state.data.oc.some(x=>x.id===state.ocSelectedId)){
+      state.ocSelectedId = state.data.oc[0]?.id || null;
+    }
+
+    fillOCForm();
+  }
+
+  function fillOCForm(){
+    const o = state.data.oc.find(x=>x.id===state.ocSelectedId);
+    if(!o){
+      $('#oc_name').value='';
+      $('#oc_line').value='';
+      $('#oc_tags').value='';
+      $('#oc_look').value='';
+      $('#oc_persona').value='';
+      $('#oc_power').value='';
+      $('#oc_hooks').value='';
+      $('#oc_notes').value='';
+      return;
+    }
+    $('#oc_name').value = o.name || '';
+    $('#oc_line').value = o.line || '';
+    $('#oc_tags').value = tagsToStr(o.tags);
+    $('#oc_look').value = o.look || '';
+    $('#oc_persona').value = o.persona || '';
+    $('#oc_power').value = o.power || '';
+    $('#oc_hooks').value = o.hooks || '';
+    $('#oc_notes').value = o.notes || '';
+  }
+
+  function saveOCFromForm(){
+    const o = state.data.oc.find(x=>x.id===state.ocSelectedId);
+    if(!o) return;
+    o.name = $('#oc_name').value.trim() || '未命名';
+    o.line = $('#oc_line').value.trim();
+    o.tags = normTags($('#oc_tags').value);
+    o.look = $('#oc_look').value;
+    o.persona = $('#oc_persona').value;
+    o.power = $('#oc_power').value;
+    o.hooks = $('#oc_hooks').value;
+    o.notes = $('#oc_notes').value;
+    state.data.meta.updatedAt = new Date().toISOString();
+  }
+
+  // =====================
+  // WORLD
+  // =====================
+  function worldMatch(w){
+    const q = state.query.trim();
+    if(!q) return true;
+    const hay = [w.title, w.body, ...(w.tags||[])].filter(Boolean).join(' ').toLowerCase();
+    const qTags = (q.match(/#[^\s#]+/g) || []).map(s=>s.trim());
+    const plain = q.replace(/#[^\s#]+/g,'').trim().toLowerCase();
+    const tagOk = qTags.length===0 || qTags.every(t => (w.tags||[]).includes(t));
+    const textOk = !plain || hay.includes(plain);
+    return tagOk && textOk;
+  }
+
+  function renderWorld(){
+    const list = state.data.world.filter(worldMatch);
+    $('#worldCount').textContent = `${state.data.world.length} 节`;
+    $('#worldListCount').textContent = `${list.length} 条`;
+
+    const box = $('#worldList');
+    box.innerHTML = '';
+    list.forEach(w => {
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.dataset.id = w.id;
+      el.innerHTML = `
+        <h4>${escapeHtml(w.title)}</h4>
+        <div class="sub">${escapeHtml((w.body||'').slice(0,70))}${(w.body||'').length>70?'…':''}</div>
+        <div class="meta">${(w.tags||[]).slice(0,6).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+      `;
+      el.onclick = () => {
+        state.worldSelectedId = w.id;
+        fillWorldForm();
+      };
+      box.appendChild(el);
+    });
+
+    if(!state.worldSelectedId){
+      state.worldSelectedId = state.data.world[0]?.id || null;
+    }
+    if(state.worldSelectedId && !state.data.world.some(x=>x.id===state.worldSelectedId)){
+      state.worldSelectedId = state.data.world[0]?.id || null;
+    }
+    fillWorldForm();
+  }
+
+  function fillWorldForm(){
+    const w = state.data.world.find(x=>x.id===state.worldSelectedId);
+    $('#w_title').value = w?.title || '';
+    $('#w_body').value = w?.body || '';
+    $('#w_tags').value = tagsToStr(w?.tags || []);
+  }
+
+  function saveWorldFromForm(){
+    const w = state.data.world.find(x=>x.id===state.worldSelectedId);
+    if(!w) return;
+    w.title = $('#w_title').value.trim() || '未命名小节';
+    w.body = $('#w_body').value;
+    w.tags = normTags($('#w_tags').value);
+    state.data.meta.updatedAt = new Date().toISOString();
+  }
+
+  // =====================
+  // NOVEL
+  // =====================
+  function novelMatch(n){
+    const q = state.query.trim();
+    const hay = [n.title, n.body, ...(n.keywords||[]), ...(n.links||[])].filter(Boolean).join(' ').toLowerCase();
+    const qTags = (q.match(/#[^\s#]+/g) || []).map(s=>s.trim());
+    const plain = q.replace(/#[^\s#]+/g,'').trim().toLowerCase();
+    const tagOk = qTags.length === 0 || qTags.every(t => (n.keywords||[]).includes(t));
+    const textOk = !plain || hay.includes(plain);
+    return tagOk && textOk;
+  }
+
+  function renderNovel(){
+    const list = state.data.novel.filter(novelMatch);
+    $('#novelCount2').textContent = `${state.data.novel.length} 条`;
+    $('#novelListCount').textContent = `${list.length} 条`;
+
+    const box = $('#novelList');
+    box.innerHTML = '';
+    list.forEach(n => {
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.dataset.id = n.id;
+      el.innerHTML = `
+        <h4>${escapeHtml(n.title)}</h4>
+        <div class="sub">${escapeHtml((n.body||'').slice(0,70))}${(n.body||'').length>70?'…':''}</div>
+        <div class="meta">${(n.keywords||[]).slice(0,6).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+      `;
+      el.onclick = () => {
+        state.novelSelectedId = n.id;
+        fillNovelForm();
+      };
+      box.appendChild(el);
+    });
+
+    if(!state.novelSelectedId){
+      state.novelSelectedId = state.data.novel[0]?.id || null;
+    }
+    if(state.novelSelectedId && !state.data.novel.some(x=>x.id===state.novelSelectedId)){
+      state.novelSelectedId = state.data.novel[0]?.id || null;
+    }
+    fillNovelForm();
+
+    $('#novelCount').textContent = `${state.data.novel.length} 条`;
+  }
+
+  function fillNovelForm(){
+    const n = state.data.novel.find(x=>x.id===state.novelSelectedId);
+    $('#n_title').value = n?.title || '';
+    $('#n_keywords').value = tagsToStr(n?.keywords || []);
+    $('#n_body').value = n?.body || '';
+    $('#n_links').value = (n?.links || []).join(', ');
+  }
+
+  function saveNovelFromForm(){
+    const n = state.data.novel.find(x=>x.id===state.novelSelectedId);
+    if(!n) return;
+    n.title = $('#n_title').value.trim() || '未命名条目';
+    n.keywords = normTags($('#n_keywords').value);
+    n.body = $('#n_body').value;
+    n.links = ($('#n_links').value || '').split(/[,，]+/).map(s=>s.trim()).filter(Boolean);
+    state.data.meta.updatedAt = new Date().toISOString();
+  }
+
+  // =====================
+  // GitHub 同步（token 方式）
+  // =====================
+  function loadCfg(){
+    try{
+      const raw = localStorage.getItem(CFG_KEY);
+      return raw ? JSON.parse(raw) : null;
+    }catch{ return null; }
+  }
+
+  function saveCfg(cfg){
+    localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+  }
+
+  function clearCfg(){
+    localStorage.removeItem(CFG_KEY);
+  }
+
+  function getCfgFromUI(){
+    return {
+      owner: $('#gh_owner').value.trim(),
+      repo: $('#gh_repo').value.trim(),
+      branch: ($('#gh_branch').value.trim() || 'main'),
+      path: ($('#gh_path').value.trim() || 'data.json'),
+      token: $('#gh_token').value.trim(),
+    };
+  }
+
+  function fillCfgUI(cfg){
+    $('#gh_owner').value = cfg?.owner || '';
+    $('#gh_repo').value = cfg?.repo || '';
+    $('#gh_branch').value = cfg?.branch || 'main';
+    $('#gh_path').value = cfg?.path || 'data.json';
+    $('#gh_token').value = cfg?.token || '';
+  }
+
+  function ghHeaders(token){
+    return {
+      'Accept': 'application/vnd.github+json',
+      'Authorization': `token ${token}`
+    };
+  }
+
+  function b64encodeUnicode(str){
+    // GitHub API 要 base64
+    const bytes = new TextEncoder().encode(str);
+    let bin = '';
+    bytes.forEach(b => bin += String.fromCharCode(b));
+    return btoa(bin);
+  }
+
+  function b64decodeUnicode(b64){
+    const bin = atob(b64);
+    const bytes = new Uint8Array([...bin].map(ch => ch.charCodeAt(0)));
+    return new TextDecoder().decode(bytes);
+  }
+
+  async function ghGetFile(cfg){
+    const url = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${encodeURIComponent(cfg.path)}?ref=${encodeURIComponent(cfg.branch)}`;
+    const res = await fetch(url, { headers: ghHeaders(cfg.token) });
+    if(!res.ok) throw new Error(`GET 失败：${res.status} ${res.statusText}`);
+    return await res.json();
+  }
+
+  async function ghPutFile(cfg, contentStr, sha){
+    const url = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${encodeURIComponent(cfg.path)}`;
+    const body = {
+      message: `Update ${cfg.path} (from OC editor)` ,
+      content: b64encodeUnicode(contentStr),
+      branch: cfg.branch,
+    };
+    if(sha) body.sha = sha;
+
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: { ...ghHeaders(cfg.token), 'Content-Type':'application/json' },
+      body: JSON.stringify(body)
+    });
+    if(!res.ok){
+      const t = await res.text().catch(()=> '');
+      throw new Error(`PUT 失败：${res.status} ${res.statusText}${t?`\n${t}`:''}`);
+    }
+    return await res.json();
+  }
+
+  async function ghPull(){
+    const cfg = getCfgFromUI();
+    if(!cfg.owner || !cfg.repo || !cfg.path || !cfg.token) throw new Error('配置不完整');
+    setStatus($('#ghStatus'), 'warn', '正在拉取…');
+    const file = await ghGetFile(cfg);
+    const text = b64decodeUnicode(file.content || '');
+    const parsed = JSON.parse(text);
+    state.data = mergeDefaults(parsed);
+    state.data.meta.updatedAt = new Date().toISOString();
+    render();
+    saveLocal();
+    setStatus($('#ghStatus'), 'ok', `拉取成功（sha: ${file.sha.slice(0,7)}）`);
+  }
+
+  async function ghPush(){
+    const cfg = getCfgFromUI();
+    if(!cfg.owner || !cfg.repo || !cfg.path || !cfg.token) throw new Error('配置不完整');
+    setStatus($('#ghStatus'), 'warn', '正在推送…');
+
+    // 先拿 sha
+    let sha = null;
+    try{
+      const file = await ghGetFile(cfg);
+      sha = file.sha;
+    }catch(e){
+      // 文件不存在时 sha 为空，仍可创建
+      sha = null;
+    }
+
+    const contentStr = JSON.stringify(state.data, null, 2);
+    const out = await ghPutFile(cfg, contentStr, sha);
+    setStatus($('#ghStatus'), 'ok', `推送成功（commit: ${out.commit?.sha?.slice(0,7) || 'OK'}）`);
+  }
+
+  // =====================
+  // 总渲染
+  // =====================
+  function render(){
+    applyEditMode();
+
+    if(state.page === 'home') renderHome();
+    if(state.page === 'oc') renderOC();
+    if(state.page === 'world') renderWorld();
+    if(state.page === 'novel') renderNovel();
+
+    // summary counts for home quick refresh
+    $('#ocCount').textContent = `${state.data.oc.length} 个`;
+    $('#novelCount').textContent = `${state.data.novel.length} 条`;
+
+    const upd = new Date(state.data.meta.updatedAt);
+    $('#summary').textContent = `上次更新：${isNaN(upd.getTime()) ? state.data.meta.updatedAt : upd.toLocaleString()}`;
+  }
+
+  // =====================
+  // 事件
+  // =====================
+  // tabs
+  $$('.tab').forEach(t => t.addEventListener('click', () => switchPage(t.dataset.page)));
+
+  // jump buttons in home
+  $$('[data-jump]').forEach(b => b.addEventListener('click', () => switchPage(b.getAttribute('data-jump'))));
+
+  // search
+  $('#q').addEventListener('input', (e) => {
+    state.query = e.target.value;
+    // 保持当前页，只刷新
+    render();
+  });
+
+  // edit toggle
+  $('#editToggle').addEventListener('click', () => {
+    state.edit = !state.edit;
+    applyEditMode();
+  });
+
+  // local save
+  $('#saveLocal').addEventListener('click', () => {
+    // 先把编辑器内容落回 data
+    if(state.page === 'oc') saveOCFromForm();
+    if(state.page === 'world') saveWorldFromForm();
+    if(state.page === 'novel') saveNovelFromForm();
+    saveLocal();
+    alert('已保存到本地浏览器（当前设备）。');
+    render();
+  });
+
+  // OC actions
+  $('#ocReset').addEventListener('click', () => {
+    state.ocActiveTags.clear();
+    state.query = '';
+    $('#q').value = '';
+    render();
+  });
+
+  $('#ocSave').addEventListener('click', () => {
+    saveOCFromForm();
+    render();
+    alert('已更新此 OC（别忘了点“本地保存”或 GitHub 推送）。');
+  });
+
+  $('#ocNew').addEventListener('click', () => {
+    const id = uid('oc');
+    const o = {
+      id,
+      name: '新角色',
+      line: '',
+      tags: ['#新建'],
+      look: '',
+      persona: '',
+      power: '',
+      hooks: '',
+      notes: ''
+    };
+    state.data.oc.unshift(o);
+    state.ocSelectedId = id;
+    fillOCForm();
+    render();
+  });
+
+  $('#ocDuplicate').addEventListener('click', () => {
+    const o = state.data.oc.find(x=>x.id===state.ocSelectedId);
+    if(!o) return;
+    const copy = clone(o);
+    copy.id = uid('oc');
+    copy.name = `${copy.name}（复制）`;
+    state.data.oc.unshift(copy);
+    state.ocSelectedId = copy.id;
+    render();
+  });
+
+  $('#ocDelete').addEventListener('click', () => {
+    const o = state.data.oc.find(x=>x.id===state.ocSelectedId);
+    if(!o) return;
+    if(!confirm(`确定删除：${o.name} ?`)) return;
+    state.data.oc = state.data.oc.filter(x=>x.id!==state.ocSelectedId);
+    state.ocSelectedId = state.data.oc[0]?.id || null;
+    render();
+  });
+
+  // World actions
+  $('#worldSave').addEventListener('click', () => {
+    saveWorldFromForm();
+    render();
+    alert('已更新此小节（别忘了本地保存/同步）。');
+  });
+
+  $('#worldNewSection').addEventListener('click', () => {
+    const id = uid('w');
+    state.data.world.unshift({ id, title:'新小节', tags:['#新建'], body:'' });
+    state.worldSelectedId = id;
+    render();
+  });
+
+  $('#worldDeleteSection').addEventListener('click', () => {
+    const w = state.data.world.find(x=>x.id===state.worldSelectedId);
+    if(!w) return;
+    if(!confirm(`确定删除小节：${w.title} ?`)) return;
+    state.data.world = state.data.world.filter(x=>x.id!==state.worldSelectedId);
+    state.worldSelectedId = state.data.world[0]?.id || null;
+    render();
+  });
+
+  // Novel actions
+  $('#novelReset').addEventListener('click', () => {
+    state.query = '';
+    $('#q').value = '';
+    render();
+  });
+
+  $('#novelSave').addEventListener('click', () => {
+    saveNovelFromForm();
+    render();
+    alert('已更新此条目（别忘了本地保存/同步）。');
+  });
+
+  $('#novelNew').addEventListener('click', () => {
+    const id = uid('n');
+    state.data.novel.unshift({ id, title:'新条目', keywords:['#新建'], links:[], body:'' });
+    state.novelSelectedId = id;
+    render();
+  });
+
+  $('#novelDuplicate').addEventListener('click', () => {
+    const n = state.data.novel.find(x=>x.id===state.novelSelectedId);
+    if(!n) return;
+    const copy = clone(n);
+    copy.id = uid('n');
+    copy.title = `${copy.title}（复制）`;
+    state.data.novel.unshift(copy);
+    state.novelSelectedId = copy.id;
+    render();
+  });
+
+  $('#novelDelete').addEventListener('click', () => {
+    const n = state.data.novel.find(x=>x.id===state.novelSelectedId);
+    if(!n) return;
+    if(!confirm(`确定删除：${n.title} ?`)) return;
+    state.data.novel = state.data.novel.filter(x=>x.id!==state.novelSelectedId);
+    state.novelSelectedId = state.data.novel[0]?.id || null;
+    render();
+  });
+
+  // Sync modal
+  const syncDlg = $('#syncDlg');
+  $('#syncOpen').addEventListener('click', () => syncDlg.showModal());
+  $('#syncClose').addEventListener('click', () => syncDlg.close());
+  syncDlg.addEventListener('click', (e) => {
+    const rect = syncDlg.getBoundingClientRect();
+    const inDialog = rect.top <= e.clientY && e.clientY <= rect.top + rect.height && rect.left <= e.clientX && e.clientX <= rect.left + rect.width;
+    if(!inDialog) syncDlg.close();
+  });
+
+  // cfg buttons
+  $('#ghRemember').addEventListener('click', () => {
+    const cfg = getCfgFromUI();
+    saveCfg(cfg);
+    setStatus($('#ghStatus'), 'ok', '已记住配置（保存在本浏览器）');
+  });
+
+  $('#ghForget').addEventListener('click', () => {
+    clearCfg();
+    fillCfgUI(null);
+    setStatus($('#ghStatus'), 'warn', '已清除');
+  });
+
+  $('#ghPull').addEventListener('click', async () => {
+    try{ await ghPull(); }
+    catch(e){ setStatus($('#ghStatus'), 'bad', e.message || '拉取失败'); }
+  });
+
+  $('#ghPush').addEventListener('click', async () => {
+    try{
+      // 推送前先把当前编辑器内容写回
+      saveOCFromForm();
+      saveWorldFromForm();
+      saveNovelFromForm();
+      await ghPush();
+    }
+    catch(e){ setStatus($('#ghStatus'), 'bad', e.message || '推送失败'); }
+  });
+
+  // export/import
+  $('#exportJson').addEventListener('click', () => {
+    $('#jsonBox').value = JSON.stringify(state.data, null, 2);
+  });
+
+  $('#importJson').addEventListener('click', () => {
+    try{
+      const raw = $('#jsonBox').value.trim();
+      if(!raw) return alert('请先粘贴 JSON。');
+      const parsed = JSON.parse(raw);
+      state.data = mergeDefaults(parsed);
+      saveLocal();
+      render();
+      alert('导入成功（并已本地保存）。');
+    }catch(e){
+      alert('导入失败：JSON 格式不对。');
+    }
+  });
+
+  // =====================
+  // 启动
+  // =====================
+  state.data = loadLocal();
+
+  // 选中默认条目
+  state.ocSelectedId = state.data.oc[0]?.id || null;
+  state.worldSelectedId = state.data.world[0]?.id || null;
+  state.novelSelectedId = state.data.novel[0]?.id || null;
+
+  // load cfg into modal
+  fillCfgUI(loadCfg());
+
+  // init statuses
+  setStatus($('#ghStatus'), 'warn', '未连接');
+  applyEditMode();
+  render();
+</script>
+
+</body>
+</html>
